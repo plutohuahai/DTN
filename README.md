@@ -8,14 +8,14 @@
 
 ## 目录结构
 
-src/ # 源代码目录
-├── DecisionEngineRouter.java # 决策引擎路由器类
-├── DistributedBubbleRap.java # 分布式BubbleRap算法实现
-├── CommunityDetection.java # 社区检测接口
-├── SimpleCommunityDetection.java # 简单社区检测算法
-├── Centrality.java # 中心性度量接口
-└── SWindowCentrality.java # 窗口中心性算法实现
-
+- [源代码](src)
+  - [DecisionEngineRouter.java](src/DecisionEngineRouter.java)
+  - [DistributedBubbleRap.java](src/DistributedBubbleRap.java)
+  - [CommunityDetection.java](src/CommunityDetection.java)
+  - [SimpleCommunityDetection.java](src/SimpleCommunityDetection.java)
+  - [Centrality.java](src/Centrality.java)
+  - [SWindowCentrality.java](src/SWindowCentrality.java)
+  - [KropRouter.java](src/KropRouter.java)
 
 ## 聚类算法
 
@@ -36,4 +36,5 @@ src/ # 源代码目录
 <p align="center">
   窗口中心性算法用于度量节点的中心性，并帮助判断最优节点转发策略。
 </p>
+
 
