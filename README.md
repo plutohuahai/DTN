@@ -15,7 +15,7 @@
   - [SimpleCommunityDetection.java](src/SimpleCommunityDetection.java)
   - [Centrality.java](src/Centrality.java)
   - [SWindowCentrality.java](src/SWindowCentrality.java)
-  - [KropRouter.java]([src/KropRouter.java](https://github.com/plutohuahai/DTN/blob/main/KropRouter.java))
+  - [KropRouter.java](KropRouter.java)
 
 ## 聚类算法
 
