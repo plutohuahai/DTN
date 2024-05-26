@@ -32,3 +32,21 @@ bash
 窗口中心性算法用于度量节点的中心性，并帮助判断最优节点转发策略。
 
 文件: SWindowCentrality.java
+使用方法
+安装和配置
+
+下载项目源代码：
+
+bash
+复制代码
+git clone https://github.com/your/repository.git
+配置开发环境和依赖项。
+
+运行示例
+
+编译和运行 DecisionEngineRouter.java 中的 main 方法。
+贡献
+
+欢迎贡献新的聚类算法或改进现有算法。
+联系我们
+如有任何问题或建议，请联系我们团队
