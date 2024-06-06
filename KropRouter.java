@@ -14,7 +14,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.xmlrpc.XmlRpcException;
+//import org.apache.xmlrpc.XmlRpcException;
 
 import routing.util.RoutingInfo;
 import smile.clustering.KMeans;
@@ -32,17 +32,18 @@ import core.SimError;
 import core.SimScenario;
 
 /**
- * K-meansÔÚDTNÖĞµÄÓ¦ÓÃ
+ * K-meansåœ¨DTNä¸­çš„åº”ç”¨
  */
 public class KropRouter extends ActiveRouter {
 
-	private Map<DTNHost, Integer> encounter = null;
+	private Map<DTNHost, Integer> encounter;
 	private int successDelivered;
 	private int label;
+	private int k = 2;        //ç°‡æ•°é‡
 
-	// Spray&WaitÅäÖÃÎÄ¼ş×Ö¶Î
-	public static final String NROF_COPIES = "nrofCopies";// ÅäÖÃÎÄ¼ş×Ö¶Î£¬ÏûÏ¢µÄ·İÊı
-	public static final String BINARY_MODE = "binaryMode";// ÅäÖÃÎÄ¼ş×Ö¶Î£¬·Ö·¢²ßÂÔ£¬trueÎªÒ»°ëÒ»°ëµØ·Ö£¬falseÎªÒ»·İÒ»·İµØ·Ö
+	// Spray&Waité…ç½®æ–‡ä»¶å­—æ®µ
+	public static final String NROF_COPIES = "nrofCopies";// é…ç½®æ–‡ä»¶å­—æ®µï¼Œæ¶ˆæ¯çš„ä»½æ•°
+	public static final String BINARY_MODE = "binaryMode";// é…ç½®æ–‡ä»¶å­—æ®µï¼Œåˆ†å‘ç­–ç•¥ï¼Œtrueä¸ºä¸€åŠä¸€åŠåœ°åˆ†ï¼Œfalseä¸ºä¸€ä»½ä¸€ä»½åœ°åˆ†
 	public static final String SPRAYANDWAIT_NS = "SprayAndWaitRouter";
 	public static final String MSG_COUNT_PROPERTY = SPRAYANDWAIT_NS + "." + "copies";
 
@@ -74,7 +75,7 @@ public class KropRouter extends ActiveRouter {
 		makeRoomForNewMessage(msg.getSize());
 
 		msg.setTtl(this.msgTtl);
-		msg.addProperty(MSG_COUNT_PROPERTY, new Integer(initialNrofCopies));// Ìí¼Ó×Ö¶Î£¬Ã¿¸öÏûÏ¢ĞèÒªÒ»¸ö×Ö¶Î±£´æ·İÊıcopies
+		msg.addProperty(MSG_COUNT_PROPERTY, Integer.valueOf(initialNrofCopies));// æ·»åŠ å­—æ®µï¼Œæ¯ä¸ªæ¶ˆæ¯éœ€è¦ä¸€ä¸ªå­—æ®µä¿å­˜ä»½æ•°copies
 		addToMessages(msg, true);
 		return true;
 	}
@@ -95,7 +96,7 @@ public class KropRouter extends ActiveRouter {
 	}
 
 	/**
-	 * µÃµ½Óë¸ø¶¨½ÚµãµÄÏàÓö´ÎÊı
+	 * å¾—åˆ°ä¸ç»™å®šèŠ‚ç‚¹çš„ç›¸é‡æ¬¡æ•°
 	 */
 	public int getCountFor(DTNHost host) {
 		if (encounter.containsKey(host)) {
@@ -106,14 +107,14 @@ public class KropRouter extends ActiveRouter {
 	}
 
 	/**
-	 * µÃµ½½ÚµãÏàÓöÀúÊ·¼ÇÂ¼
+	 * å¾—åˆ°èŠ‚ç‚¹ç›¸é‡å†å²è®°å½•
 	 */
 	public Map<DTNHost, Integer> getEncounterCord() {
 		return this.encounter;
 	}
 
 	/**
-	 * µÃµ½Óë¸ø¶¨½ÚµãµÄ¾àÀë
+	 * å¾—åˆ°ä¸ç»™å®šèŠ‚ç‚¹çš„è·ç¦»
 	 */
 	public double getDistance(DTNHost host) {
 		Coord otherlocation = host.getLocation();
@@ -123,43 +124,43 @@ public class KropRouter extends ActiveRouter {
 	}
 
 	/**
-	 * µÃµ½¸Ã½áµãÊ£Óà»º´æ¿Õ¼ä
+	 * å¾—åˆ°è¯¥èŠ‚ç‚¹å‰©ä½™ç¼“å­˜ç©ºé—´
 	 */
 	public int getReamainBuffer() {
 		return super.getFreeBufferSize();
 	}
 
 	/**
-	 * µÃµ½¸Ã½áµã³É¹¦Í¶µİµÄÏûÏ¢Êı
+	 * å¾—åˆ°è¯¥èŠ‚ç‚¹æˆåŠŸæŠ•é€’çš„æ¶ˆæ¯æ•°
 	 */
 	public int getSuccessDelivered() {
 		return this.successDelivered;
 	}
 
 	/**
-	 * ÉèÖÃ¸Ã½áµã³É¹¦Í¶µİµÄÏûÏ¢Êı
+	 * è®¾ç½®è¯¥èŠ‚ç‚¹æˆåŠŸæŠ•é€’çš„æ¶ˆæ¯æ•°
 	 */
 	public void setSuccessDelivered(int count) {
 		this.successDelivered = count;
 	}
 
 	/**
-	 * µÃµ½¸Ã½áµã±ê¼ÇµÄÀà±ğ
+	 * å¾—åˆ°è¯¥èŠ‚ç‚¹æ ‡è®°çš„ç±»åˆ«
 	 */
 	public int getLabel() {
 		return this.label;
 	};
 
 	/**
-	 * µÃµ½¸Ã½áµã±ê¼ÇµÄÀà±ğ
+	 * è®¾ç½®è¯¥èŠ‚ç‚¹æ ‡è®°çš„ç±»åˆ«
 	 */
 	public void SetLabel(int label) {
 		this.label = label;
 	};
 
-	// ¼ÙÉèA·¢ËÍÏûÏ¢m¸øB£¬ÄÇÃ´´«ÊäÍê±Ïºó£¬AºÍBµÄ»º³åÇø¶¼ÓĞm£¬¶¼ĞèÒª¶Ôm¸üĞÂcopies¡£ÖµµÃ×¢ÒâµÄÊÇ£¬¸üĞÂ·¢ËÍ¶ËºÍ½ÓÊÕ¶Ë¶¼ÓÉA·¢Æğ
+	// å‡è®¾Aå‘é€æ¶ˆæ¯mç»™Bï¼Œé‚£ä¹ˆä¼ è¾“å®Œæ¯•åï¼ŒAå’ŒBçš„ç¼“å­˜åŒºéƒ½æœ‰mï¼Œéƒ½éœ€è¦å¯¹mè¿›è¡Œæ›´æ–°copiesã€‚å€¼å¾—æ³¨æ„çš„æ˜¯ï¼Œæ›´æ–°å‘é€ç«¯å’Œæ¥æ”¶ç«¯éƒ½ç”±Aå‘èµ·
 	@Override
-	protected void transferDone(Connection con) {// ¸üĞÂ·¢ËÍ¶Ë
+	protected void transferDone(Connection con) {// æ›´æ–°å‘é€ç«¯
 		Integer nrofCopies;
 		String msgId = con.getMessage().getId();
 		Message msg = getMessage(msgId);
@@ -195,7 +196,7 @@ public class KropRouter extends ActiveRouter {
 		return msg;
 	}
 
-	// getMessagesWithCopiesLeftÔÚgetMessageCollection()µÄ»ù´¡ÉÏ£¬¹ıÂËµôÄÇĞ©copiesĞ¡ÓÚ1µÄÏûÏ¢
+	// getMessagesWithCopiesLeftåœ¨getMessageCollection()çš„åŸºç¡€ä¸Šï¼Œè¿‡æ»¤æ‰é‚£äº›copieså°äº1çš„æ¶ˆæ¯
 	protected List<Message> getMessagesWithCopiesLeft() {
 		List<Message> list = new ArrayList<Message>();
 
@@ -226,25 +227,27 @@ public class KropRouter extends ActiveRouter {
 
 	private Tuple<Message, Connection> tryOtherMessages() {
 
-		List<Tuple<Message, Connection>> messages = new ArrayList<Tuple<Message, Connection>>();// ·¢ËÍ¶ÓÁĞ
+		List<Tuple<Message, Connection>> messages = new ArrayList<>();// å‘é€é˜Ÿåˆ—
 		List<DTNHost> hosts = SimScenario.hosts;
 
 		@SuppressWarnings(value = "unchecked")
 		List<Message> copiesLeft = sortByQueueMode(getMessagesWithCopiesLeft());
 
-		// ÁÚ¾Ó½ÚµãĞ¡ÓÚ2µÄÇé¿ö
+		// é‚»å±…èŠ‚ç‚¹å°äº2çš„æƒ…å†µ
 		int size = getConnections().size();
 		if (size < 2) {
 			tryMessagesToConnections(copiesLeft, getConnections());
 			return null;
 		}
 
+		
 		for (Message m : copiesLeft) {
 			DTNHost destination = m.getTo();
 			int count = 0;
-			// Óë×î¼ÑÖĞĞÄ±È½Ï
-			int totalEncounter = 0;// ×î´óÏàÓö´ÎÊı
-			int totalSd = 0;// ×î´óÍ¶µİÊıÁ¿
+			int totalEncounter = 0;// æœ€å¤§ç›¸é‡æ¬¡æ•°
+			int totalSd = 0;// æœ€å¤§æŠ•é€’æ•°é‡
+			
+			//è®¡ç®—ä¸æœ€ä½³ä¸­å¿ƒçš„æ¯”è¾ƒæ•°æ®
 			for (DTNHost h : hosts) {
 				if (h == destination)
 					continue;
@@ -252,59 +255,50 @@ public class KropRouter extends ActiveRouter {
 				totalEncounter += router.getCountFor(destination);
 				totalSd += router.deliveredMessages.size();
 			}
-			double[][] sampleObject = new double[getConnections().size()][4];
-			for (Connection con : getConnections()) {
-				KropRouter otherrouter = (KropRouter) con.getOtherNode(getHost()).getRouter();
-				// ½«²ÎÊı´«Èëpython
-				sampleObject[count][0] = otherrouter.getCountFor(destination);
-				sampleObject[count][1] = otherrouter.getDistance(destination);
-				sampleObject[count][2] = otherrouter.getReamainBuffer();
-				sampleObject[count][3] = otherrouter.getSuccessDelivered();
-				count++;
+			
+			int connSize = getConnections().size();
+			double[][] sampleObject = new double[connSize][4];
+			for (int i = 0; i < connSize; i++) {
+				Connection con = getConnections().get(i);
+				KropRouter otherRouter = (KropRouter) con.getOtherNode(getHost()).getRouter();
+				sampleObject[count][0] = otherRouter.getCountFor(destination);
+				sampleObject[count][1] = otherRouter.getDistance(destination);
+				sampleObject[count][2] = otherRouter.getReamainBuffer();
+				sampleObject[count][3] = otherRouter.getSuccessDelivered();
 			}
-			double[][] dataT = new double[4][getConnections().size()];// ×ªÖÃ¾ØÕó
-			double[][] data_train = new double[getConnections().size()][4];// ¹éÒ»»¯ºóµÄ¾ØÕó
-
-			for (int i = 0; i < sampleObject.length; i++) {
-				for (int j = 0; j < sampleObject[i].length; j++) {
-					dataT[j][i] = sampleObject[i][j];
-				}
-			}
-			for (int i = 0; i < dataT.length; i++) {
-				Arrays.sort(dataT[i]);
-			}
-			for (int i = 0; i < data_train.length; i++) {
-				for (int j = 0; j < data_train[i].length; j++) {
-					// ×î´ó×îĞ¡¹éÒ»»¯
-					data_train[i][j] = (sampleObject[i][j] - dataT[j][0]) / (dataT[j][dataT[j].length - 1] - dataT[j][0]);
-				}
-			}
-			// ÑµÁ·Êı¾İ
-			KMeans kmeans = KMeans.fit(data_train, 2);
+			
+			double[][] dataT = transposeMatrix(sampleObject); // è½¬ç½®çŸ©é˜µ
+			normalizeMatrix(dataT); // å½’ä¸€åŒ–çŸ©é˜µ
+			
+			KMeans kmeans = KMeans.fit(dataT, k);   // è®­ç»ƒæ•°æ®
 			int[] labels = kmeans.y;
 
-			// ¼ÇÂ¼Æ½¾ù¾àÀë
-			double[] sumD = new double[kmeans.k];
-			int[] sumC = new int[kmeans.k];
+			// è®°å½•å¹³å‡è·ç¦»
+			double[] sumD = new double[k];
+			int[] sumC = new int[k];
 			for (int i = 0; i < sampleObject.length; i++) {
 				double number = Math.sqrt(Math.pow((sampleObject[i][0] - totalEncounter), 2)
-						+ Math.pow((sampleObject[i][1] - 0), 2) + Math.pow((sampleObject[i][2] - 50000000), 2)
+						+ Math.pow((sampleObject[i][1] - 0), 2) 
+						+ Math.pow((sampleObject[i][2] - 50000000), 2)
 						+ Math.pow((sampleObject[i][3] - totalSd), 2));
 				sumD[labels[i]] += number;
 				sumC[labels[i]]++;
 			}
-			int minLabel;
-			if ((sumD[0] / sumC[0]) < (sumD[1] / sumC[1])) {
-				minLabel = 0;
-			} else {
-				minLabel = 1;
+			
+			int minLabel = 0;
+			double minAverageDistance = sumD[0] / sumC[0];
+			
+			for (int i = 1; i < sumD.length; i++) {
+				double averageDistance = sumD[i] /sumC[0];
+				if (averageDistance < minAverageDistance) {
+					minLabel = i;
+					minAverageDistance = averageDistance;
+				}
 			}
 
-			List<Connection> connections = getConnections();
-			for (int i = 0; i < connections.size(); i++) {
-				Connection con = connections.get(i);
+	 		for (int i = 0; i < connSize; i++) {
 				if (labels[i] == minLabel) {
-					messages.add(new Tuple<Message, Connection>(m, con));
+					messages.add(new Tuple<>(m, getConnections().get(i)));
 				}
 			}
 		}
@@ -315,7 +309,33 @@ public class KropRouter extends ActiveRouter {
 
 		return tryMessagesForConnected(messages); // try to send messages
 	}
+	
+	
+	//çŸ©é˜µè½¬ç½®
+	private double[][] transposeMatrix(double[][] matrix) {
+		double[][] transposed = new double[matrix[0].length][matrix.length];
+		for (int i = 0; i < matrix.length; i++) {
+			for (int j = 0; j < matrix[i].length; j++) {
+				transposed[j][i] = matrix[i][j];
+			}
+		}
+		return transposed;
+	}
+	
+	//å½’ä¸€åŒ–çŸ©é˜µ
+	private void normalizeMatrix(double[][] matrix) {
+		for (int i = 0;i < matrix.length; i++) {
+			Arrays.sort(matrix[i]);
+			double minVal = matrix[i][0];
+			double maxVal = matrix[i][matrix[i].length - 1];
+			for (int j = 0; j < matrix[i].length; j++) {
+				matrix[i][j] = (matrix[i][j] - minVal) / (maxVal - minVal);
+			}
+		}
+	}
+	
 
+	
 	@Override
 	public MessageRouter replicate() {
 		KropRouter r = new KropRouter(this);
